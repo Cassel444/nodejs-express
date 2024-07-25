@@ -4,8 +4,9 @@ import cors from "cors";
 
 import { env } from "./utils/env.js";
 import { ENV_VARS } from "./constants/index.js";
+import { getAllStudents, getStudentById } from "./services/students.js";
 
-const PORT = Number(env(ENV_VARS.PORT, "3000"));
+const PORT = Number(env(ENV_VARS.PORT, "3001"));
 
 export const startServer = () => {
     const app = express();
@@ -20,9 +21,28 @@ export const startServer = () => {
     }),
     );
 
-    app.get("/", (req, res) => {
-        res.send("Hello my real world!"
-        );
+    app.get("/students", async (req, res) => {
+        const students = await getAllStudents();
+
+        res.status(200).json({
+            data: students,
+        });
+
+    });
+
+    app.get("/students/:studentId", async (req, res, next) => {
+        const { studentId } = req.params;
+        const student = await getStudentById(studentId);
+
+        if (!student) {
+            res.status(404).json({
+                message: "Student not found!",
+            });
+            return;
+        }
+        res.status(200).json({
+            data: student,
+        });
     });
 
     app.use("*", (req, res, next) => {
