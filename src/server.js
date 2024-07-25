@@ -3,8 +3,9 @@ import pino from "pino-http";
 import cors from "cors";
 
 import { env } from "./utils/env.js";
+import { ENV_VARS } from "./constants/index.js";
 
-const PORT = Number(env("PORT", "3000"));
+const PORT = Number(env(ENV_VARS.PORT, "3000"));
 
 export const startServer = () => {
     const app = express();
@@ -20,14 +21,13 @@ export const startServer = () => {
     );
 
     app.get("/", (req, res) => {
-        res.json({
-            message: "Hello my world!",
-        });
+        res.send("Hello my real world!"
+        );
     });
 
     app.use("*", (req, res, next) => {
         res.status(404).json({
-            message: "Nor found",
+            message: "Not found",
         });
     });
 
