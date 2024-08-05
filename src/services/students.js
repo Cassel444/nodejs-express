@@ -1,25 +1,18 @@
+import createHttpError from "http-errors";
 import { StudentsCollection } from "../db/models/student.js";
 
-export const getAllStudents = async () => {
-    const students = await StudentsCollection.find();
-    return students;
-};
+export const getAllStudents = () => StudentsCollection.find();
 
-export const getStudentById = async (studentId) => {
-    const student = await StudentsCollection.findById(studentId);
-    return student;
-};
+export const getStudentById = (studentId) => StudentsCollection.findById(studentId);
 
-export const createStudent = async (payload) => {
-    const student = await StudentsCollection.create(payload);
-    return student;
+export const createStudent = (payload) => {
+    return StudentsCollection.create(payload);
 };
 
 export const deleteStudent = async (studentId) => {
-    const student = await StudentsCollection.findByIdAndDelete({
+    return StudentsCollection.findOneAndDelete({
         _id: studentId,
     });
-    return student;
 };
 
 export const updateStudent = async (studentId, payload, options = {}) => {
@@ -28,15 +21,16 @@ export const updateStudent = async (studentId, payload, options = {}) => {
         payload,
         {
             new: true,
-             includeResultMetadata: true,
-              ...options,
+            includeResultMetadata: true,
+            ...options,
         },
     );
 
-    if (!rawResult || !rawResult.value) return null;
-
+    if (!rawResult || !rawResult.value) {
+        throw (createHttpError(404, "Student not found"));
+    }
     return {
         student: rawResult.value,
-        isNew: Boolean(rawResult?.lastErrorObject?.upserted),
+        isNew: Boolean(rawResult?.lastErrorObject?.updatedExisting)
     };
 };
