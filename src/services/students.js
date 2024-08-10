@@ -1,7 +1,54 @@
 import createHttpError from "http-errors";
 import { StudentsCollection } from "../db/models/student.js";
+import { calculatePaginationData } from "../utils/calculatePaginationData.js";
 
-export const getAllStudents = () => StudentsCollection.find();
+
+
+export const getAllStudents = async ({ page,
+    perPage,
+    sortOrder,
+    sortBy,
+    filter,
+}) => {
+    const limit = perPage;
+    const skip = page > 0 ? (page - 1) * perPage : 0;
+
+    const studentsQuery = StudentsCollection.find();
+
+    if (typeof filter.gender !== "undefined") {
+        studentsQuery.where("gender").equals(filter.gender);
+    }
+    if (typeof filter.maxAge !== "undefined") {
+        studentsQuery.where("age").lte(filter.maxAge);
+    }
+    if (typeof filter.minAge !== "undefined") {
+        studentsQuery.where("age").gte(filter.minAge);
+    }
+    if (typeof filter.maxAvgMark !== "undefined") {
+        studentsQuery.where("avgMark").lte(filter.maxAvgMark);
+    }
+    if (typeof
+        filter.minAvgMark !== "undefined") {
+        studentsQuery.where("avgMark").gte(filter.minAvgMark);
+    }
+
+
+    const [studentsCount, students] = await Promise.all([
+        StudentsCollection.countDocuments(studentsQuery),
+
+        studentsQuery
+            .sort({ [sortBy]: sortOrder })
+            .skip(skip)
+            .limit(limit),
+    ]);
+
+    const paginationData = calculatePaginationData(studentsCount, perPage, page);
+
+    return {
+        data: students,
+        ...paginationData,
+    };
+};
 
 export const getStudentById = (studentId) => StudentsCollection.findById(studentId);
 
