@@ -39,7 +39,8 @@ export const getAllStudents = async ({ page,
         studentsQuery
             .sort({ [sortBy]: sortOrder })
             .skip(skip)
-            .limit(limit),
+            .limit(limit)
+            .exec(),
     ]);
 
     const paginationData = calculatePaginationData(studentsCount, perPage, page);

@@ -17,17 +17,17 @@ import { ctrlWrapper } from "../utils/ctrlWrapper.js";
 
 const router = Router();
 
-router.get("/students", ctrlWrapper(getStudentsController));
+router.get("/", ctrlWrapper(getStudentsController));
 
-router.get("/students/:studentId", isValidId("studentId"), ctrlWrapper(getStudentsByIdController));
+router.get("/:studentId", isValidId("studentId"), ctrlWrapper(getStudentsByIdController));
 
-router.post("/students", validateBody(createStudentSchema), ctrlWrapper(createStudentController));
+router.post("/register", validateBody(createStudentSchema), ctrlWrapper(createStudentController));
 
-router.delete("/students/:studentId", isValidId("studentId"), ctrlWrapper(deleteStudentController));
+router.delete("/:studentId", isValidId("studentId"), ctrlWrapper(deleteStudentController));
 
-router.put("/students/:studentId", isValidId("studentId"), validateBody(createStudentSchema), ctrlWrapper(upsertStudentController));
+router.put("/:studentId", isValidId("studentId"), validateBody(createStudentSchema), ctrlWrapper(upsertStudentController));
 
-router.patch("/students/:studentId", isValidId("studentId"), validateBody(updateStudentSchema), ctrlWrapper(patchStudentController));
+router.patch("/:studentId", isValidId("studentId"), validateBody(updateStudentSchema), ctrlWrapper(patchStudentController));
 
 
 export default router;

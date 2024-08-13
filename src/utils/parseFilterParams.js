@@ -22,7 +22,7 @@ const parseNumber = (number) => {
 };
 
 
-export const ParseFilterParams = (query) => {
+export const parseFilterParams = (query) => {
     const { gender, maxAge, minAge, maxAvgMark, minAvgMark } = query;
 
     const parsedGender = parseGender(gender);
