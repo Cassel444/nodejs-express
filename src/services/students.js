@@ -1,14 +1,15 @@
 import createHttpError from "http-errors";
 import { StudentsCollection } from "../db/models/student.js";
 import { calculatePaginationData } from "../utils/calculatePaginationData.js";
+import { SORT_ORDER } from "../constants/index.js";
 
 
-
-export const getAllStudents = async ({ page,
-    perPage,
-    sortOrder,
-    sortBy,
-    filter,
+export const getAllStudents = async ({ page = 1,
+    perPage = 10,
+    sortOrder = SORT_ORDER.ASC,
+    sortBy = "_id",
+    filter = {},
+    userId,
 }) => {
     const limit = perPage;
     const skip = page > 0 ? (page - 1) * perPage : 0;
@@ -31,6 +32,7 @@ export const getAllStudents = async ({ page,
         filter.minAvgMark !== "undefined") {
         studentsQuery.where("avgMark").gte(filter.minAvgMark);
     }
+    studentsQuery.where("userId").equals(userId);
 
 
     const [studentsCount, students] = await Promise.all([
@@ -51,21 +53,22 @@ export const getAllStudents = async ({ page,
     };
 };
 
-export const getStudentById = (studentId) => StudentsCollection.findById(studentId);
+export const getStudentById = (studentId, userId) => StudentsCollection.findOne({ _id: studentId, userId });
 
 export const createStudent = (payload) => {
     return StudentsCollection.create(payload);
 };
 
-export const deleteStudent = async (studentId) => {
+export const deleteStudent = async (studentId, userId) => {
     return StudentsCollection.findOneAndDelete({
         _id: studentId,
+        userId,
     });
 };
 
 export const updateStudent = async (studentId, payload, options = {}) => {
     const rawResult = await StudentsCollection.findOneAndUpdate(
-        { _id: studentId },
+        { _id: studentId},
         payload,
         {
             new: true,
